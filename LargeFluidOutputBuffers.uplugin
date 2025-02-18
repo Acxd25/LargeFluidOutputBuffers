@@ -1,0 +1,33 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.0",
+	"FriendlyName": "LargeFluidOutputBuffers",
+	"Description": "Increase Fluid Output Bufers to 100m3 on all producers.",
+	"Category": "Modding",
+	"CreatedBy": "Joanna Hammond",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "LargeFluidOutputBuffers",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "SML",
+			"Enabled": true,
+			"SemVersion": "^3.9.1"
+		}
+	],
+	"SemVersion": "1.0.0",
+	"GameVersion": ">=383729"
+}
