@@ -2,7 +2,7 @@
 	"FileVersion": 3,
 	"Version": 1,
 	"VersionName": "1.0.0",
-	"FriendlyName": "LargeFluidOutputBuffers",
+	"FriendlyName": "Large Fluid Output Buffers",
 	"Description": "Increase Fluid Output Bufers to 100m3 on all producers.",
 	"Category": "Modding",
 	"CreatedBy": "Joanna Hammond",
