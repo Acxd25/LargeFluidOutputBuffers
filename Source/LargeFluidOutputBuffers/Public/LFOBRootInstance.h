@@ -13,7 +13,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Abstract)
 class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 {
 	GENERATED_BODY()
