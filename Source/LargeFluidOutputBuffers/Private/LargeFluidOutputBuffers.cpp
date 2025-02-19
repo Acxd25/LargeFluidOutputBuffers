@@ -2,6 +2,8 @@
 
 #include "LargeFluidOutputBuffers.h"
 
+DEFINE_LOG_CATEGORY(LogLFBO);
+
 #define LOCTEXT_NAMESPACE "FLargeFluidOutputBuffersModule"
 
 void FLargeFluidOutputBuffersModule::StartupModule()
