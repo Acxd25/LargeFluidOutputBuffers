@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogLFBO, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogLFOB, Log, All);
 
 class FLargeFluidOutputBuffersModule : public IModuleInterface
 {

@@ -2,13 +2,14 @@
 
 #include "LargeFluidOutputBuffers.h"
 
-DEFINE_LOG_CATEGORY(LogLFBO);
+DEFINE_LOG_CATEGORY(LogLFOB);
 
 #define LOCTEXT_NAMESPACE "FLargeFluidOutputBuffersModule"
 
 void FLargeFluidOutputBuffersModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
+	UE_LOG(LogLFOB, Display, TEXT("LFOB TEST TEST TEST"));
 }
 
 void FLargeFluidOutputBuffersModule::ShutdownModule()
