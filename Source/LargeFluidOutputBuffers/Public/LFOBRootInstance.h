@@ -6,7 +6,9 @@
 #include "Module/GameInstanceModule.h"
 #include "LargeFluidOutputBuffers.h"
 #include "FGBuildableFactory.h"
+#include "FGBuildableManufacturer.h"
 #include "FGInventoryLibrary.h"
+#include "Patching/NativeHookManager.h"
 
 #include "LFOBRootInstance.generated.h"
 
