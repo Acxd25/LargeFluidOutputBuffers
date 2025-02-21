@@ -1,7 +1,7 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0.0",
+	"VersionName": "1.0.0-alpha",
 	"FriendlyName": "Large Fluid Output Buffers",
 	"Description": "Increase Fluid Output Bufers to 100m3 on all producers.",
 	"Category": "Modding",
@@ -28,6 +28,6 @@
 			"SemVersion": "^3.9.1"
 		}
 	],
-	"SemVersion": "1.0.0",
+	"SemVersion": "1.0.0-alpha",
 	"GameVersion": ">=383729"
 }
