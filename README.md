@@ -1,2 +1,2 @@
 # LargeFluidOutputBuffers
-Satsifactory Mod increasing Output Buffer of liquids to 100m3
+Satsifactory Mod increasing Output Buffer of liquids/gasses to 100m3
