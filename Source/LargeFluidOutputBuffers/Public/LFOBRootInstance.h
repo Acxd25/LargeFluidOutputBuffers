@@ -9,6 +9,7 @@
 #include "FGBuildableManufacturer.h"
 #include "FGInventoryLibrary.h"
 #include "Patching/NativeHookManager.h"
+#include "LargeFluidOutputBuffersConfigurationStruct.h"
 
 #include "LFOBRootInstance.generated.h"
 

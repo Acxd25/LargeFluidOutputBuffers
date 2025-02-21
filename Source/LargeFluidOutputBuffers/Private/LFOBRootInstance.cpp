@@ -6,6 +6,9 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* self, TSub
     FInventoryItem item;
     FInventoryStack stack;
 
+    FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(self->GetWorld());
+    int32 size = 1000 * config.OutputBufferSizeFluids;
+
     TArray< FItemAmount > products = UFGRecipe::GetProducts(recipe);
     for (int32 i = 0; i < products.Num(); i++)
     {
@@ -15,7 +18,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* self, TSub
         if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
         {
             UE_LOG(LogLFOB, Display, TEXT("Output Found GAS/FLUID '%s' at index %d, increasing buffer to 100m3"), *itemDesc, i);
-            inventory->AddArbitrarySlotSize(i, 100000);
+            inventory->AddArbitrarySlotSize(i, size);
         }
     }
 }
