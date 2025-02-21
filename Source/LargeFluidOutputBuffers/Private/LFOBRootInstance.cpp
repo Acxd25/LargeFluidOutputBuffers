@@ -1,6 +1,3 @@
-
-
-
 #include "LFOBRootInstance.h"
 
 void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
