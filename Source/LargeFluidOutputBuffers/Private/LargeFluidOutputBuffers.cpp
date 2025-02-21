@@ -9,7 +9,6 @@ DEFINE_LOG_CATEGORY(LogLFOB);
 void FLargeFluidOutputBuffersModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	UE_LOG(LogLFOB, Display, TEXT("LFOB TEST TEST TEST"));
 }
 
 void FLargeFluidOutputBuffersModule::ShutdownModule()

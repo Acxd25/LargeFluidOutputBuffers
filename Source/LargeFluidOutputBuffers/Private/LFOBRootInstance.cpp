@@ -3,6 +3,26 @@
 
 #include "LFOBRootInstance.h"
 
+void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
+{
+    UFGInventoryComponent* inventory = self->GetOutputInventory();
+    FInventoryItem item;
+    FInventoryStack stack;
+
+    TArray< FItemAmount > products = UFGRecipe::GetProducts(recipe);
+    for (int32 i = 0; i < products.Num(); i++)
+    {
+        TSubclassOf<class UFGItemDescriptor> itemClass = products[i].ItemClass;
+        EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
+        FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
+        if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
+        {
+            UE_LOG(LogLFOB, Display, TEXT("Output Found GAS/FLUID '%s' at index %d, increasing buffer to 100m3"), *itemDesc, i);
+            inventory->AddArbitrarySlotSize(i, 100000);
+        }
+    }
+}
+
 void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase Phase)
 {
 	Super::DispatchLifecycleEvent(Phase);
@@ -10,56 +30,20 @@ void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase Phase)
     {
         if (!WITH_EDITOR) 
         {
-            //AFGBuildableManufacturer* SampleObject = GetMutableDefault<AFGBuildableManufacturer>();
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::SetRecipe,
                 [](AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
                 {
-                    UE_LOG(LogLFOB, Display, TEXT("Recipe Changed, adjusting Output Buffer."));
-                    UFGInventoryComponent* inventory = self->GetOutputInventory();
-                    FInventoryItem item;
-                    FInventoryStack stack;
-                    
-                    for (int32 i = 0; i < inventory->GetSizeLinear(); i++)
-                    {
-                        if (inventory->GetStackFromIndex(i, stack))
-                        {
-                            UE_LOG(LogLFOB, Display, TEXT("Check Stack %d"), i);
-                            TSubclassOf<class UFGItemDescriptor> itemClass = stack.Item.GetItemClass();
-                            if (not itemClass)
-                            {
-                                UE_LOG(LogLFOB, Display, TEXT("itemClass NULLPTR"));
-                            }
-                            else
-                            {
-                                UE_LOG(LogLFOB, Display, TEXT("Check Stack %s"), *itemClass->GetDescription());
-                            }
-                            
-                            UE_LOG(LogLFOB, Display, TEXT("Size = %d."), stack.Item.GetItemStackSize());
+                    UE_LOG(LogLFOB, Display, TEXT("Recipe Changed, Checking Output Buffer."));
+                    ProcessOutputBuffer(self, recipe);
+                });
 
-                            //EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
-                            //if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
-                            //{
-                                UE_LOG(LogLFOB, Display, TEXT("Found GAS/FLUID"));
-                                // Fix that Stack Size!
-                                inventory->AddArbitrarySlotSize(i, 100000);
-                            //}
-                        }
-                    }
+            SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::BeginPlay,
+                [](AFGBuildableManufacturer* self)
+                {
+                    UE_LOG(LogLFOB, Display, TEXT("BeginPlay Called, Checking Output Buffer."));
+                    TSubclassOf< class UFGRecipe > recipe = self->GetCurrentRecipe();
+                    ProcessOutputBuffer(self, recipe);
                 });
         }
-
-
-        /*UE_LOG(LogLFOB, Display, TEXT("Attempting CDO on Build_OilRefinery."));
-        if (const TSubclassOf<AFGBuildableFactory> BPBuildableOilRefinery = LoadClass<AFGBuildableFactory>(NULL, TEXT("/Game/FactoryGame/Buildable/Factory/OilRefinery/Build_OilRefinery.Build_OilRefinery_C")))
-        {
-            AFGBuildableFactory* buildableFactoryCDO = BPBuildableOilRefinery.GetDefaultObject();
-            buildableFactoryCDO->mFluidStackSizeMultiplier = 2;
-			EditedCDOs.Add(buildableFactoryCDO);
-            UE_LOG(LogLFOB, Display, TEXT("Build_OilRefinery CDO Applied."));
-        }
-        else
-        {
-            UE_LOG(LogLFOB, Error, TEXT("Attempting CDO on Build_OilRefinery FAILED."));
-        }*/
 	}
 }

@@ -25,6 +25,8 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 	UPROPERTY()
 	TSet<UObject*> EditedCDOs;
 
+	protected:
+		static void ProcessOutputBuffer(AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe);
 	public:
 	virtual void DispatchLifecycleEvent(ELifecyclePhase Phase) override;
 };
