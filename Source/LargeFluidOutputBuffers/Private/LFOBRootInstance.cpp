@@ -17,7 +17,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* self, TSub
         FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
         if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
         {
-            UE_LOG(LogLFOB, Display, TEXT("Output Found GAS/FLUID '%s' at index %d, increasing buffer to 100m3"), *itemDesc, i);
+            UE_LOG(LogLFOB, Display, TEXT("Found %s Output '%s' at index %d, increasing buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, config.OutputBufferSizeFluids);
             inventory->AddArbitrarySlotSize(i, size);
         }
     }
@@ -33,14 +33,14 @@ void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase Phase)
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::SetRecipe,
                 [](AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
                 {
-                    UE_LOG(LogLFOB, Display, TEXT("Recipe Changed, Checking Output Buffer."));
+                    UE_LOG(LogLFOB, Display, TEXT("SetRecipe Called, Checking Output Buffers."));
                     ProcessOutputBuffer(self, recipe);
                 });
 
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::BeginPlay,
                 [](AFGBuildableManufacturer* self)
                 {
-                    UE_LOG(LogLFOB, Display, TEXT("BeginPlay Called, Checking Output Buffer."));
+                    UE_LOG(LogLFOB, Display, TEXT("BeginPlay Called, Checking Output Buffers."));
                     TSubclassOf< class UFGRecipe > recipe = self->GetCurrentRecipe();
                     ProcessOutputBuffer(self, recipe);
                 });
