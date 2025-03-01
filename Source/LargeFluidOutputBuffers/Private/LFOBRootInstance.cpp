@@ -2,47 +2,59 @@
 
 void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe)
 {
-    // Ensure we have a recipe to work with
-    if (not recipe)
+    // Is manufacturer valid?
+    if (not manufacturer)
     {
-        UE_LOG(LogLFOB, Display, TEXT("Recipe not set, nothing to do."));
+        UE_LOG(LogLFOB, Error, TEXT("AFGBuildableManufacturer NULLPTR."));
     }
-    else if (not manufacturer)
+    // Is recipe set?
+    else if (not recipe)
     {
-        UE_LOG(LogLFOB, Display, TEXT("Manufacturer not set, nothing to do."));
+        UE_LOG(LogLFOB, Display, TEXT("%s Recipe not set, nothing to do."), *manufacturer->GetName());
     }
+    // Try to process
     else
     {
         // Grab the output inventory
         UFGInventoryComponent* inventory = manufacturer->GetOutputInventory();
-        // Grab the requested size in m3
-        FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(manufacturer->GetWorld());
-        int32 configSize = config.OutputBufferSizeFluids;
-        // Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
-        if (configSize < 50)
+        // Do we have a valid inventory?
+        if (not inventory)
         {
-            configSize = 50;
+            UE_LOG(LogLFOB, Display, TEXT("%s inventory not set, nothing to do."), *manufacturer->GetName());
         }
-        else if (configSize > 600)
+        // Inventory valid so contine to process recipe
+        else
         {
-            configSize = 600;
-        }
-        // Target Size for buffer.
-        int32 size = 1000 * configSize;
-        // Get All Products for the recipe
-        TArray< FItemAmount > products = UFGRecipe::GetProducts(recipe);
-
-        // Check those products for being a gas or liquid and set the buffer size if they are
-        for (int32 i = 0; i < products.Num(); i++)
-        {
-            TSubclassOf<class UFGItemDescriptor> itemClass = products[i].ItemClass;
-            EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
-            
-            if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
+            // Grab the requested size in m3
+            FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(manufacturer->GetWorld());
+            int32 configSize = config.OutputBufferSizeFluids;
+            // Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
+            if (configSize < 50)
             {
-                FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
-                UE_LOG(LogLFOB, Display, TEXT("Found %s Output '%s' at index %d, setting buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, configSize);
-                inventory->AddArbitrarySlotSize(i, size);
+                configSize = 50;
+            }
+            else if (configSize > 600)
+            {
+                configSize = 600;
+            }
+            // Target Size for buffer in litres.
+            int32 size = 1000 * configSize;
+
+            // Get All Products for the recipe
+            TArray<FItemAmount> products = UFGRecipe::GetProducts(recipe);
+
+            // Check those products for being a gas or liquid and set the buffer size if they are
+            for (int32 i = 0; i < products.Num(); i++)
+            {
+                TSubclassOf<class UFGItemDescriptor> itemClass = products[i].ItemClass;
+                EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
+
+                if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
+                {
+                    FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
+                    UE_LOG(LogLFOB, Display, TEXT("Found %s Output '%s' at index %d, setting buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, configSize);
+                    inventory->AddArbitrarySlotSize(i, size);
+                }
             }
         }
     }
