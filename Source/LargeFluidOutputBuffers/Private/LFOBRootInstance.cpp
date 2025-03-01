@@ -20,7 +20,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
         // Do we have a valid inventory?
         if (not inventory)
         {
-            UE_LOG(LogLFOB, Error, TEXT("%s inventory not set, nothing to do."), *manufacturer->GetName());
+            UE_LOG(LogLFOB, Error, TEXT("%s inventory NULLPTR"), *manufacturer->GetName());
         }
         // Inventory valid so contine to process recipe
         else
