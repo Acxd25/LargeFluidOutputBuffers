@@ -20,14 +20,8 @@ UCLASS(Abstract)
 class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 {
 	GENERATED_BODY()
-
-	private:
-	/* Marked as UPROPERTY because it holds CDO edits */
-	UPROPERTY()
-	TSet<UObject*> EditedCDOs;
-
 	protected:
-		static void ProcessOutputBuffer(AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe);
+		void ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
 	public:
 	virtual void DispatchLifecycleEvent(ELifecyclePhase Phase) override;
 };
