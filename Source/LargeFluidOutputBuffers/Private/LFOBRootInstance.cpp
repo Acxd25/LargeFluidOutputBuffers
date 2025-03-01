@@ -60,10 +60,10 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
     }
 }
 
-void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase Phase)
+void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase phase)
 {
-	Super::DispatchLifecycleEvent(Phase);
-	if (Phase == ELifecyclePhase::POST_INITIALIZATION)
+	Super::DispatchLifecycleEvent(phase);
+	if (phase == ELifecyclePhase::POST_INITIALIZATION)
     {
         if (!WITH_EDITOR) 
         {
