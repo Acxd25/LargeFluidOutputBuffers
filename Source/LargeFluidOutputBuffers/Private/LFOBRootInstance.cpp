@@ -37,7 +37,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
             {
                 configSize = 600;
             }
-            // Target Size for buffer in litres.
+            // Target Size for buffer in litres.    
             int32 size = 1000 * configSize;
 
             // Get All Products for the recipe
@@ -52,7 +52,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                 if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
                 {
                     FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
-                    UE_LOG(LogLFOB, Display, TEXT("Found %s Output '%s' at index %d, setting buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, configSize);
+                    UE_LOG(LogLFOB, Display, TEXT("Found %s Output on '%s' at index %d, setting buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, configSize);
                     inventory->AddArbitrarySlotSize(i, size);
                 }
             }
