@@ -122,7 +122,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                         }
                         sizeInCubicMeters = sizeInLitres / 1000;
                     }
-                    UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output on '%s' at index %d, setting buffer to %d m3"), *mode , (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, sizeInCubicMeters);
+                    UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output on '%s' at index %d, setting buffer to %d m3"), *mode , form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMeters);
                     inventory->AddArbitrarySlotSize(i, sizeInLitres);
                 }
             }
