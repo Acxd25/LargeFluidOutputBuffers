@@ -109,7 +109,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                     // Are we supposed to automatically set the buffer size?  If so calculate the correct value.
                     if (autoSetBuffers)
                     {
-                        sizeInLitres = products[i].Amount * 2 * productionBoost;
+                        sizeInLitres = ceil(products[i].Amount * 2 * productionBoost);
                         // Ensure we are never less than 50m3
                         if (sizeInLitres < 50000)
                         {
