@@ -72,24 +72,24 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
             // Can we exceed 600m3 during an autoset?
             bool exceedMax = config.ExceedPipeMax;
 
-            int32 sizeInCubicMeters;
+            int32 sizeInCubicMetres;
             int32 sizeInLitres;
 
             if (!autoSetBuffers)
             {
                 // Grab the requested size in m3
-                sizeInCubicMeters = config.OutputBufferSizeFluids;
+                sizeInCubicMetres = config.OutputBufferSizeFluids;
                 // Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
-                if (sizeInCubicMeters < 50)
+                if (sizeInCubicMetres < 50)
                 {
-                    sizeInCubicMeters = 50;
+                    sizeInCubicMetres = 50;
                 }
-                else if (sizeInCubicMeters > 600)
+                else if (sizeInCubicMetres > 600)
                 {
-                    sizeInCubicMeters = 600;
+                    sizeInCubicMetres = 600;
                 }
                 // Target Size for buffer in litres.    
-                sizeInLitres = 1000 * sizeInCubicMeters;
+                sizeInLitres = 1000 * sizeInCubicMetres;
             }
 
             FString mode = autoSetBuffers ? exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
@@ -110,7 +110,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                     if (autoSetBuffers)
                     {
                         sizeInLitres = products[i].Amount * 2 * productionBoost;
-                        // Ensure we are never less than 50m3 or above 600m3
+                        // Ensure we are never less than 50m3
                         if (sizeInLitres < 50000)
                         {
                             sizeInLitres = 50000;
@@ -120,9 +120,9 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                         {
                             sizeInLitres = 600000;
                         }
-                        sizeInCubicMeters = sizeInLitres / 1000;
+                        sizeInCubicMetres = sizeInLitres / 1000;
                     }
-                    UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output '%s' at index %d, setting buffer to %d m3"), *mode , form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMeters);
+                    UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output '%s' at index %d, setting buffer to %d m3"), *mode , form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMetres);
                     inventory->AddArbitrarySlotSize(i, sizeInLitres);
                 }
             }
