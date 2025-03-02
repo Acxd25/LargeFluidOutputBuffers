@@ -115,6 +115,7 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                         {
                             sizeInLitres = 50000;
                         }
+                        // Only do this check if we are not exceeding 600m3
                         else if (!exceedMax && sizeInLitres > 600000)
                         {
                             sizeInLitres = 600000;
