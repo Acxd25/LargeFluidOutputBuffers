@@ -64,22 +64,35 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
         // Inventory valid so contine to process recipe
         else
         {
-            // Grab the requested size in m3
-            FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(manufacturer->GetWorld());
+            // Grab the Configuration for this mod.
+            FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
+
+            // Should we auto calculate the correct buffer sizes?
             bool autoSetBuffers = config.AutoSetBuffers;
+            // Can we exceed 600m3 during an autoset?
             bool exceedMax = config.ExceedPipeMax;
-            int32 configSize = config.OutputBufferSizeFluids;
-            // Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
-            if (configSize < 50)
+
+            int32 sizeInCubicMeters;
+            int32 sizeInLitres;
+
+            if (!autoSetBuffers)
             {
-                configSize = 50;
+                // Grab the requested size in m3
+                sizeInCubicMeters = config.OutputBufferSizeFluids;
+                // Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
+                if (sizeInCubicMeters < 50)
+                {
+                    sizeInCubicMeters = 50;
+                }
+                else if (sizeInCubicMeters > 600)
+                {
+                    sizeInCubicMeters = 600;
+                }
+                // Target Size for buffer in litres.    
+                sizeInLitres = 1000 * sizeInCubicMeters;
             }
-            else if (configSize > 600)
-            {
-                configSize = 600;
-            }
-            // Target Size for buffer in litres.    
-            int32 size = 1000 * configSize;
+
+            FString mode = autoSetBuffers ? exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
 
             // Get All Products for the recipe
             TArray<FItemAmount> products = UFGRecipe::GetProducts(recipe);
@@ -96,20 +109,20 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
                     // Are we supposed to automatically set the buffer size?  If so calculate the correct value.
                     if (autoSetBuffers)
                     {
-                        size = products[i].Amount * 2 * productionBoost;
+                        sizeInLitres = products[i].Amount * 2 * productionBoost;
                         // Ensure we are never less than 50m3 or above 600m3
-                        if (size < 50000)
+                        if (sizeInLitres < 50000)
                         {
-                            size = 50000;
+                            sizeInLitres = 50000;
                         }
-                        else if (!exceedMax && size > 600000)
+                        else if (!exceedMax && sizeInLitres > 600000)
                         {
-                            size = 600000;
+                            sizeInLitres = 600000;
                         }
-                        configSize = size / 1000;
+                        sizeInCubicMeters = sizeInLitres / 1000;
                     }
-                    UE_LOG(LogLFOB, Display, TEXT("Found %s Output on '%s' at index %d, setting buffer to %d m3"), (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, configSize);
-                    inventory->AddArbitrarySlotSize(i, size);
+                    UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output on '%s' at index %d, setting buffer to %d m3"), *mode , (form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid")), *itemDesc, i, sizeInCubicMeters);
+                    inventory->AddArbitrarySlotSize(i, sizeInLitres);
                 }
             }
         }
