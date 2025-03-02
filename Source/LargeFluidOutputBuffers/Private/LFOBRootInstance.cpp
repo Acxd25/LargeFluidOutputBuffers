@@ -68,9 +68,9 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
             FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
 
             // Should we auto calculate the correct buffer sizes?
-            bool autoSetBuffers = config.AutoSetBuffers;
+            bool autoSetBuffers = config.DynamicSettings.AutoSetBuffers;
             // Can we exceed 600m3 during an autoset?
-            bool exceedMax = config.ExceedPipeMax;
+            bool exceedMax = config.DynamicSettings.ExceedPipeMax;
 
             int32 sizeInCubicMetres;
             int32 sizeInLitres;

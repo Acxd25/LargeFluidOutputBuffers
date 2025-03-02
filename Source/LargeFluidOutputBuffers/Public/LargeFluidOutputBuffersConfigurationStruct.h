@@ -4,6 +4,19 @@
 #include "Engine/Engine.h"
 #include "LargeFluidOutputBuffersConfigurationStruct.generated.h"
 
+struct FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings;
+
+USTRUCT(BlueprintType)
+struct FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings {
+    GENERATED_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite)
+    bool AutoSetBuffers{};
+
+    UPROPERTY(BlueprintReadWrite)
+    bool ExceedPipeMax{};
+};
+
 /* Struct generated from Mod Configuration Asset '/LargeFluidOutputBuffers/Configuration/LargeFluidOutputBuffersConfiguration' */
 USTRUCT(BlueprintType)
 struct FLargeFluidOutputBuffersConfigurationStruct {
@@ -13,10 +26,7 @@ public:
     int32 OutputBufferSizeFluids{};
 
     UPROPERTY(BlueprintReadWrite)
-    bool AutoSetBuffers{};
-
-    UPROPERTY(BlueprintReadWrite)
-    bool ExceedPipeMax{};
+    FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings DynamicSettings{};
 
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FLargeFluidOutputBuffersConfigurationStruct GetActiveConfig(UObject* WorldContext) {
