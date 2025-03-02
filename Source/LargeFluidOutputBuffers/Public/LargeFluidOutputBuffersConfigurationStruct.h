@@ -12,6 +12,12 @@ public:
     UPROPERTY(BlueprintReadWrite)
     int32 OutputBufferSizeFluids{};
 
+    UPROPERTY(BlueprintReadWrite)
+    bool AutoSetBuffers{};
+
+    UPROPERTY(BlueprintReadWrite)
+    bool ExceedPipeMax{};
+
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FLargeFluidOutputBuffersConfigurationStruct GetActiveConfig(UObject* WorldContext) {
         FLargeFluidOutputBuffersConfigurationStruct ConfigStruct{};
