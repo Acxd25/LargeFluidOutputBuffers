@@ -1,6 +1,6 @@
 #include "LFOBRootInstance.h"
 
-void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer)
 {
     // Is manufacturer valid?  
     if (not IsValid(manufacturer))
@@ -9,10 +9,10 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
         return;
     }
 
-	ProcessOutputBufferInternal(manufacturer, manufacturer->GetCurrentRecipe(), manufacturer->GetCurrentProductionBoost());
+	ProcessOutputBuffersInternal(manufacturer, manufacturer->GetCurrentRecipe(), manufacturer->GetCurrentProductionBoost());
 }
 
-void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
 {
     // Is manufacturer valid?  
     if (not IsValid(manufacturer))
@@ -21,10 +21,10 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
         return;
     }
 
-	ProcessOutputBufferInternal(manufacturer, recipe, manufacturer->GetCurrentProductionBoost());
+	ProcessOutputBuffersInternal(manufacturer, recipe, manufacturer->GetCurrentProductionBoost());
 }
 
-void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, float productionBoost)
 {
     // Is manufacturer valid?  
     if (not IsValid(manufacturer))
@@ -33,10 +33,10 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
         return;
     }
 
-	ProcessOutputBufferInternal(manufacturer, manufacturer->GetCurrentRecipe(), productionBoost);
+	ProcessOutputBuffersInternal(manufacturer, manufacturer->GetCurrentRecipe(), productionBoost);
 }
 
-void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
 {
 	// Is manufacturer valid?  
 	if (not IsValid(manufacturer))
@@ -45,11 +45,10 @@ void ULFOBRootInstance::ProcessOutputBuffer(AFGBuildableManufacturer* manufactur
 		return;
 	}
 
-	ProcessOutputBufferInternal(manufacturer, recipe, productionBoost);
+	ProcessOutputBuffersInternal(manufacturer, recipe, productionBoost);
 }
 
-// DO NOT CALL DIRECTLY.
-void ULFOBRootInstance::ProcessOutputBufferInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
 {
 	// Is recipe set?
 	if (not IsValid(recipe))
@@ -145,21 +144,21 @@ void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase phase)
                 [&](AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
                 {
                     UE_LOG(LogLFOB, Display, TEXT("SetRecipe Called on %s, Checking Output Buffers."), *self->GetName());
-                    ProcessOutputBuffer(self, recipe);
+                    ProcessOutputBuffers(self, recipe);
                 });
 
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::BeginPlay,
                 [&](AFGBuildableManufacturer* self)
                 {
                     UE_LOG(LogLFOB, Display, TEXT("BeginPlay Called on %s, Checking Output Buffers."), *self->GetName());
-                    ProcessOutputBuffer(self);
+                    ProcessOutputBuffers(self);
                 });
 
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::SetCurrentProductionBoost,
                 [&](AFGBuildableManufacturer* self, float newProductionBoost)
                 {
                     UE_LOG(LogLFOB, Display, TEXT("SetCurrentProductionBoost Called on %s, Checking Output Buffers."), *self->GetName());
-                    ProcessOutputBuffer(self, newProductionBoost);
+                    ProcessOutputBuffers(self, newProductionBoost);
                 });
         }
 	}

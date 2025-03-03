@@ -10,7 +10,7 @@
 #include "FGInventoryLibrary.h"
 #include "Patching/NativeHookManager.h"
 #include "LargeFluidOutputBuffersConfigurationStruct.h"
-
+	
 #include "LFOBRootInstance.generated.h"
 
 /**
@@ -22,11 +22,17 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 	GENERATED_BODY()
 
 	public:
-		void ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer);
-		void ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
-		void ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, float productionBoost);
-		void ProcessOutputBuffer(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		// Buffer Process functions
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, float productionBoost);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+
+		// Lifecycle handler
 		virtual void DispatchLifecycleEvent(ELifecyclePhase phase) override;
+
 	private:
-		void ProcessOutputBufferInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		// Actually process the buffers, do not call directly via any friend mechanisms.  Use
+		// the public methods
+		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
 };
