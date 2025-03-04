@@ -159,7 +159,7 @@ void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase phase)
 			* This could be a new machine in the world (in this case it would not have a recipe so nothing would be done) 
 			* but more importantly it is called for each machine when a save game is loaded.
 			* Any modifications to an output inventory are not stored in the savegame so we need to go through every machine
-			* in the world and set it's correct buffer value, either calculated or preset by the user.
+			* in the world and set its correct buffer value, either calculated or preset by the user.
 			*/
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::BeginPlay,
                 [&](AFGBuildableManufacturer* self)
