@@ -140,20 +140,40 @@ void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase phase)
     {
         if (!WITH_EDITOR) 
         {
+			/*
+			* Bind to the Set Recpie method, this is called when the user selects a recipe.
+			* 
+			* At this point we need to analyse that recipe and determine what products are fluids 
+			* and adjust the buffer to accomodate either 2 cycles or set the value to the user define buffer
+			* value.
+			*/
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::SetRecipe,
                 [&](AFGBuildableManufacturer* self, TSubclassOf< class UFGRecipe > recipe)
                 {
                     UE_LOG(LogLFOB, Display, TEXT("SetRecipe Called on %s, Checking Output Buffers."), *self->GetName());
                     ProcessOutputBuffers(self, recipe);
                 });
-
+			/*
+			* Bind to the BeginPlay method, this is called when a machine is instantiated in the world.	
+			* 
+			* This could be a new machine in the world (in this case it would not have a recipe so nothing would be done) 
+			* but more importantly it is called for each machine when a save game is loaded.
+			* Any modifications to an output inventory are not stored in the savegame so we need to go through every machine
+			* in the world and set it's correct buffer value, either calculated or preset by the user.
+			*/
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::BeginPlay,
                 [&](AFGBuildableManufacturer* self)
                 {
                     UE_LOG(LogLFOB, Display, TEXT("BeginPlay Called on %s, Checking Output Buffers."), *self->GetName());
                     ProcessOutputBuffers(self);
                 });
-
+			/*
+			* Bind to the SetCurrentProductionBoost, this is called whenever sommersloops are added or removed and the next cycle has started.
+			* 
+			* If the production boost has changed we need to recalculate the buffer size on this machine or set to the users defined value
+			* as boosting will increase the cycles production amount, technically in user defined fixed buffer mode this doesn't need to change anything
+			* as it would have been set on BeginPlay or SetRecipe.
+			*/
             SUBSCRIBE_UOBJECT_METHOD_AFTER(AFGBuildableManufacturer, AFGBuildableManufacturer::SetCurrentProductionBoost,
                 [&](AFGBuildableManufacturer* self, float newProductionBoost)
                 {
