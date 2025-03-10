@@ -35,4 +35,6 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 		// Actually process the buffers, do not call directly via any friend mechanisms.  Use
 		// the public methods
 		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		// Recalculate if we can produce products
+		void RecaculateCanProduce(AFGBuildableManufacturer* manufacturer);
 };

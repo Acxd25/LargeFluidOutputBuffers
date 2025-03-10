@@ -126,11 +126,38 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 					}
 					sizeInCubicMetres = sizeInLitres / 1000;
 				}
+
 				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMetres);
 				inventory->AddArbitrarySlotSize(i, sizeInLitres);
 			}
 		}
 	}
+
+	// Now we have done all this we should recalculate if this machine can produce
+	// Fixes a bug where depending on order execution a machine can be left in an infinite idle state post buffer
+	// modification
+	RecaculateCanProduce(manufacturer);
+}
+
+void ULFOBRootInstance::RecaculateCanProduce(AFGBuildableManufacturer* manufacturer)
+{
+	manufacturer->bCachedHasOutputSpace = 1;
+	UFGInventoryComponent* mOutputInventory = manufacturer->mOutputInventory;
+	if (mOutputInventory)
+	{
+		const UFGRecipe* mCachedRecipe = manufacturer->mCachedRecipe;
+		if (mCachedRecipe)
+		{
+			// Go through the recipe and determine if we can actually store a boosted output
+			for (FItemAmount fItemAmount : mCachedRecipe->GetProducts())
+			{
+				TSubclassOf<class UFGItemDescriptor> itemClass = fItemAmount.ItemClass;
+				FInventoryStack iStack = FInventoryStack(fItemAmount.Amount * manufacturer->mCurrentProductionBoost, itemClass);
+				manufacturer->bCachedHasOutputSpace &= mOutputInventory->HasEnoughSpaceForStack(iStack);
+			}
+		}
+	}
+
 }
 
 void ULFOBRootInstance::DispatchLifecycleEvent(ELifecyclePhase phase)
