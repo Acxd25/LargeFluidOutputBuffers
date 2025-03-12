@@ -150,8 +150,6 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 */
 void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe)
 {
-	// TODO:  Sort this out if we do go ahead with solids processing.
-	FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
 	FString tDirection = parameters.direction == ProcessingParameters::Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
 	TArray<FItemAmount> items = parameters.direction == ProcessingParameters::Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
 
@@ -161,11 +159,13 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 		TSubclassOf<class UFGItemDescriptor> itemClass = items[i].ItemClass;
 		if (IsValid(itemClass))
 		{
-			EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
-			FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
+			const EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
+			const FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
 
 			if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
 			{
+				const FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
+
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
 				if (parameters.autoSetFluidBuffers)
 					ProcessDynamicFluidBufferSize(items[i], parameters);
@@ -177,6 +177,8 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 			}
 			else if (form == EResourceForm::RF_SOLID && parameters.processSolids)
 			{
+				const FString mode = parameters.autoSetSolidBuffers ? parameters.allowBelowMinStack ? TEXT("DYNAMIC-") : TEXT("DYNAMIC") : TEXT("FIXED");
+
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
 				if (parameters.autoSetSolidBuffers)
 					ProcessDynamicSolidBufferSize(items[i], parameters);
