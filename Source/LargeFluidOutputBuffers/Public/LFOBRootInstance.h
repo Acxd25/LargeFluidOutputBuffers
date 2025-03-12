@@ -24,11 +24,11 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 	public:
 		// Buffer Process functions
 		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer);
-		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
-		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, float productionBoost);
-		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const float productionBoost);
+		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, const float productionBoost);
 		void ProcessInputBuffers(AFGBuildableManufacturer* manufacturer);
-		void ProcessInputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
+		void ProcessInputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe);
 
 		// Lifecycle handler
 		virtual void DispatchLifecycleEvent(ELifecyclePhase phase) override;

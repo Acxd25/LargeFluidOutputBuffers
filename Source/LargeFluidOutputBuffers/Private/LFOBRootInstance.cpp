@@ -12,7 +12,7 @@ void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufactu
 	ProcessOutputBuffersInternal(manufacturer, manufacturer->GetCurrentRecipe(), manufacturer->GetCurrentProductionBoost());
 }
 
-void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf<class UFGRecipe> recipe)
 {
     // Is manufacturer valid?  
     if (not IsValid(manufacturer))
@@ -24,7 +24,7 @@ void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufactu
 	ProcessOutputBuffersInternal(manufacturer, recipe, manufacturer->GetCurrentProductionBoost());
 }
 
-void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const float productionBoost)
 {
     // Is manufacturer valid?  
     if (not IsValid(manufacturer))
@@ -36,7 +36,7 @@ void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufactu
 	ProcessOutputBuffersInternal(manufacturer, manufacturer->GetCurrentRecipe(), productionBoost);
 }
 
-void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, const float productionBoost)
 {
 	// Is manufacturer valid?  
 	if (not IsValid(manufacturer))
