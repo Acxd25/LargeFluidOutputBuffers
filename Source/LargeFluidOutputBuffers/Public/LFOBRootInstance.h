@@ -63,7 +63,7 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 
 		// Actually process the buffers, do not call any of these directly via any friend mechanisms.  Use
 		// the public methods
-		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe,const float productionBoost);
 		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe);
 		void ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe);
 		static inline void ProcessFixedFluidBufferSize(const ProcessingParameters& parameters);

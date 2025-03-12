@@ -72,7 +72,7 @@ void ULFOBRootInstance::ProcessInputBuffers(AFGBuildableManufacturer* manufactur
 	ProcessInputBuffersInternal(manufacturer, recipe);
 }
 
-void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, const float productionBoost)
 {
 	// Is recipe set?
 	if (not IsValid(recipe))
@@ -174,12 +174,14 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 				inventory->AddArbitrarySlotSize(i, parameters.sizeInLitres);
 				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
 			}
-			else if (form == EResourceForm::RF_SOLID  && parameters.processSolids)
+			else if (form == EResourceForm::RF_SOLID && parameters.processSolids)
 			{
+				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
 				if (parameters.autoSetSolidBuffers)
 					ProcessDynamicSolidBufferSize(items[i], parameters);
 				else
 					ProcessFixedSolidBufferSize(parameters);
+
 				inventory->AddArbitrarySlotSize(i, parameters.solidStackSize);
 				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found Solid %s '%s' at index %d, setting buffer from %d to %d items"), *mode, *tDirection, *itemDesc, i, items[i].Amount, parameters.solidStackSize);
 			}
