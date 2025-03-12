@@ -215,6 +215,7 @@ void ULFOBRootInstance::ProcessFixedFluidBufferSize(const ProcessingParameters& 
 
 void ULFOBRootInstance::ProcessDynamicFluidBufferSize(const FItemAmount item, const ProcessingParameters& parameters)
 {
+	// Calculate the required size in m3
 	parameters.sizeInLitres = ceil(item.Amount * 2 * parameters.productionBoost);
 	// Ensure we are never less than 50m3
 	if (parameters.sizeInLitres < 50000)
@@ -231,6 +232,7 @@ void ULFOBRootInstance::ProcessDynamicFluidBufferSize(const FItemAmount item, co
 
 void ULFOBRootInstance::ProcessFixedSolidBufferSize(const ProcessingParameters& parameters)
 {
+	// Grab the requested size
 	parameters.solidStackSize = parameters.fixedSolidStackSize;
 	if (!parameters.allowBelowMinStack && parameters.solidStackSize < 50)
 	{
@@ -240,6 +242,7 @@ void ULFOBRootInstance::ProcessFixedSolidBufferSize(const ProcessingParameters& 
 
 void ULFOBRootInstance::ProcessDynamicSolidBufferSize(const FItemAmount item, const ProcessingParameters& parameters)
 {
+	// Calculate the required size, we don't really need 2x for inputs but's a good idea to keep a buffer of at least 1 production cycle.
 	parameters.solidStackSize = ceil(item.Amount * 2 * parameters.productionBoost);
 	if (!parameters.allowBelowMinStack && parameters.solidStackSize < 50)
 	{
