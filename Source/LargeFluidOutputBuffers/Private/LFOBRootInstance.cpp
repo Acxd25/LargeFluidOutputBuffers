@@ -93,69 +93,16 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 	// Grab the Configuration for this mod.
 	FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
 
+	ProcessingParameters parameters;
 	// Should we auto calculate the correct buffer sizes?
-	bool autoSetBuffers = config.DynamicSettings.AutoSetBuffers;
+	parameters.autoSetBuffers = config.DynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
-	bool exceedMax = config.DynamicSettings.ExceedPipeMax;
+	parameters.exceedMax = config.DynamicSettings.ExceedPipeMax;
 
-	int32 sizeInCubicMetres;
-	int32 sizeInLitres;
+	if (!parameters.autoSetBuffers)
+		ProcessStandardBufferSize(parameters, config.OutputBufferSizeFluids);
 
-	if (!autoSetBuffers)
-	{
-		// Grab the requested size in m3
-		sizeInCubicMetres = config.OutputBufferSizeFluids;
-		// Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
-		if (sizeInCubicMetres < 50)
-		{
-			sizeInCubicMetres = 50;
-		}
-		else if (sizeInCubicMetres > 600)
-		{
-			sizeInCubicMetres = 600;
-		}
-		// Target Size for buffer in litres.    
-		sizeInLitres = 1000 * sizeInCubicMetres;
-	}
-
-	FString mode = autoSetBuffers ? exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
-
-	// Get All Products for the recipe
-	TArray<FItemAmount> products = UFGRecipe::GetProducts(recipe);
-
-	// Check those products for being a gas or liquid and set the buffer size if they are
-	for (int32 i = 0; i < products.Num(); i++)
-	{
-		TSubclassOf<class UFGItemDescriptor> itemClass = products[i].ItemClass;
-		if (IsValid(itemClass))
-		{
-			EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
-
-			if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
-			{
-				FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
-				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
-				if (autoSetBuffers)
-				{
-					sizeInLitres = ceil(products[i].Amount * 2 * productionBoost);
-					// Ensure we are never less than 50m3
-					if (sizeInLitres < 50000)
-					{
-						sizeInLitres = 50000;
-					}
-					// Only do this check if we are not exceeding 600m3
-					else if (!exceedMax && sizeInLitres > 600000)
-					{
-						sizeInLitres = 600000;
-					}
-					sizeInCubicMetres = sizeInLitres / 1000;
-				}
-
-				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Output '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMetres);
-				inventory->AddArbitrarySlotSize(i, sizeInLitres);
-			}
-		}
-	}
+	ProcessInventory(inventory, parameters, recipe, Direction::OUTPUT, productionBoost);
 
 	// Now we have done all this we should recalculate if this machine can produce
 	// Fixes a bug where depending on order execution a machine can be left in an infinite idle state post buffer
@@ -190,40 +137,31 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 	if (!modifyInputs)
 		return;
 
+	ProcessingParameters parameters;
 	// Should we auto calculate the correct buffer sizes?
-	bool autoSetBuffers = config.InputDynamicSettings.AutoSetBuffers;
+	parameters.autoSetBuffers = config.InputDynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
-	bool exceedMax = config.InputDynamicSettings.ExceedPipeMax;
+	parameters.exceedMax = config.InputDynamicSettings.ExceedPipeMax;
 
-	int32 sizeInCubicMetres;
-	int32 sizeInLitres;
+	if (!parameters.autoSetBuffers)
+		ProcessStandardBufferSize(parameters, config.InputBufferSizeFluids);
 
-	if (!autoSetBuffers)
+	ProcessInventory(inventory, parameters, recipe, Direction::INPUT);
+}
+
+/*
+* Process the provided inventory against the provided items, this could be an input or output inventory compared agsinst ingredients or products.
+*/
+void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe, Direction direction, float productionBoost)
+{
+	FString mode = parameters.autoSetBuffers ? parameters.exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
+	FString tDirection = direction == Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
+	TArray<FItemAmount> items = direction == Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
+
+	// Check those recipe items for being a gas or liquid and set the buffer size if they are
+	for (int32 i = 0; i < items.Num(); i++)
 	{
-		// Grab the requested size in m3
-		sizeInCubicMetres = modifyInputs?config.InputBufferSizeFluids:config.OutputBufferSizeFluids;
-		// Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
-		if (sizeInCubicMetres < 50)
-		{
-			sizeInCubicMetres = 50;
-		}
-		else if (sizeInCubicMetres > 600)
-		{
-			sizeInCubicMetres = 600;
-		}
-		// Target Size for buffer in litres.    
-		sizeInLitres = 1000 * sizeInCubicMetres;
-	}
-
-	FString mode = autoSetBuffers ? exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
-
-	// Get All Ingredients for the recipe
-	TArray<FItemAmount> ingredients = UFGRecipe::GetIngredients(recipe);
-
-	// Check those ingredients for being a gas or liquid and set the buffer size if they are
-	for (int32 i = 0; i < ingredients.Num(); i++)
-	{
-		TSubclassOf<class UFGItemDescriptor> itemClass = ingredients[i].ItemClass;
+		TSubclassOf<class UFGItemDescriptor> itemClass = items[i].ItemClass;
 		if (IsValid(itemClass))
 		{
 			EResourceForm form = UFGItemDescriptor::GetForm(itemClass);
@@ -232,27 +170,47 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 			{
 				FString itemDesc = UFGItemDescriptor::GetItemName(itemClass).ToString();
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
-				if (autoSetBuffers)
+				if (parameters.autoSetBuffers)
 				{
-					sizeInLitres = ceil(ingredients[i].Amount * 2);
+					parameters.sizeInLitres = ceil(items[i].Amount * 2 * productionBoost);
 					// Ensure we are never less than 50m3
-					if (sizeInLitres < 50000)
+					if (parameters.sizeInLitres < 50000)
 					{
-						sizeInLitres = 50000;
+						parameters.sizeInLitres = 50000;
 					}
 					// Only do this check if we are not exceeding 600m3
-					else if (!exceedMax && sizeInLitres > 600000)
+					else if (!parameters.exceedMax && parameters.sizeInLitres > 600000)
 					{
-						sizeInLitres = 600000;
+						parameters.sizeInLitres = 600000;
 					}
-					sizeInCubicMetres = sizeInLitres / 1000;
+					parameters.sizeInCubicMetres = parameters.sizeInLitres / 1000;
 				}
 
-				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s Input '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *itemDesc, i, sizeInCubicMetres);
-				inventory->AddArbitrarySlotSize(i, sizeInLitres);
+				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
+				inventory->AddArbitrarySlotSize(i, parameters.sizeInLitres);
 			}
 		}
 	}
+}
+
+/*
+* Determine the calculated buffer size for an inventory buffer in litres.
+*/
+void ULFOBRootInstance::ProcessStandardBufferSize(ProcessingParameters& parameters, int32 requestedBufferSize)
+{
+	// Grab the requested size in m3
+	parameters.sizeInCubicMetres = requestedBufferSize;
+	// Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
+	if (parameters.sizeInCubicMetres < 50)
+	{
+		parameters.sizeInCubicMetres = 50;
+	}
+	else if (parameters.sizeInCubicMetres > 600)
+	{
+		parameters.sizeInCubicMetres = 600;
+	}
+	// Target Size for buffer in litres.    
+	parameters.sizeInLitres = 1000 * parameters.sizeInCubicMetres;
 }
 
 void ULFOBRootInstance::RecaculateCanProduceOutput(AFGBuildableManufacturer* manufacturer)
