@@ -140,7 +140,7 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 	// Can we exceed 600m3 during an autoset?
 	parameters.exceedFluidMax = config.InputDynamicSettings.ExceedPipeMax;
 	parameters.fixedBufferSize = config.InputBufferSizeFluids;
-	parameters.direction = Direction::INPUT;
+	parameters.direction = ProcessingParameters::Direction::INPUT;
 
 	ProcessInventory(inventory, parameters, recipe);
 }
@@ -151,8 +151,8 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe)
 {
 	FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
-	FString tDirection = parameters.direction == Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
-	TArray<FItemAmount> items = parameters.direction == Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
+	FString tDirection = parameters.direction == ProcessingParameters::Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
+	TArray<FItemAmount> items = parameters.direction == ProcessingParameters::Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
 
 	// Check those recipe items for being a gas or liquid and set the buffer size if they are
 	for (int32 i = 0; i < items.Num(); i++)
