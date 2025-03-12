@@ -150,6 +150,7 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 */
 void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe)
 {
+	// TODO:  Sort this out if we do go ahead with solids processing.
 	FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
 	FString tDirection = parameters.direction == ProcessingParameters::Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
 	TArray<FItemAmount> items = parameters.direction == ProcessingParameters::Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
