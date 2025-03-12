@@ -5,9 +5,21 @@
 #include "LargeFluidOutputBuffersConfigurationStruct.generated.h"
 
 struct FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings;
+struct FLargeFluidOutputBuffersConfigurationStruct_InputDynamicSettings;
 
 USTRUCT(BlueprintType)
 struct FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings {
+    GENERATED_BODY()
+public:
+    UPROPERTY(BlueprintReadWrite)
+    bool AutoSetBuffers{};
+
+    UPROPERTY(BlueprintReadWrite)
+    bool ExceedPipeMax{};
+};
+
+USTRUCT(BlueprintType)
+struct FLargeFluidOutputBuffersConfigurationStruct_InputDynamicSettings {
     GENERATED_BODY()
 public:
     UPROPERTY(BlueprintReadWrite)
@@ -27,6 +39,15 @@ public:
 
     UPROPERTY(BlueprintReadWrite)
     FLargeFluidOutputBuffersConfigurationStruct_DynamicSettings DynamicSettings{};
+
+    UPROPERTY(BlueprintReadWrite)
+    int32 InputBufferSizeFluids{};
+
+    UPROPERTY(BlueprintReadWrite)
+    FLargeFluidOutputBuffersConfigurationStruct_InputDynamicSettings InputDynamicSettings{};
+
+    UPROPERTY(BlueprintReadWrite)
+    bool EnableInputAdjustments{};
 
     /* Retrieves active configuration value and returns object of this struct containing it */
     static FLargeFluidOutputBuffersConfigurationStruct GetActiveConfig(UObject* WorldContext) {
