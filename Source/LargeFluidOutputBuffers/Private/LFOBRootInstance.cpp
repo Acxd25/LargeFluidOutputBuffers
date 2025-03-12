@@ -98,7 +98,7 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 	parameters.autoSetFluidBuffers = config.DynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
 	parameters.exceedFluidMax = config.DynamicSettings.ExceedPipeMax;
-	parameters.fixedBufferSize = config.OutputBufferSizeFluids;
+	parameters.fixedFluidBufferSize = config.OutputBufferSizeFluids;
 	parameters.productionBoost = productionBoost;
 
 	ProcessInventory(inventory, parameters, recipe);
@@ -139,7 +139,7 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 	parameters.autoSetFluidBuffers = config.InputDynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
 	parameters.exceedFluidMax = config.InputDynamicSettings.ExceedPipeMax;
-	parameters.fixedBufferSize = config.InputBufferSizeFluids;
+	parameters.fixedFluidBufferSize = config.InputBufferSizeFluids;
 	parameters.direction = ProcessingParameters::Direction::INPUT;
 
 	ProcessInventory(inventory, parameters, recipe);
@@ -199,7 +199,7 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 void ULFOBRootInstance::ProcessFixedFluidBufferSize(const ProcessingParameters& parameters)
 {
 	// Grab the requested size in m3
-	parameters.sizeInCubicMetres = parameters.fixedBufferSize;
+	parameters.sizeInCubicMetres = parameters.fixedFluidBufferSize;
 	// Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
 	if (parameters.sizeInCubicMetres < 50)
 	{

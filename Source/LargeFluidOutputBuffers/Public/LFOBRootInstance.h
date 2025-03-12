@@ -49,7 +49,7 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 			// Fluid Variables
 			bool autoSetFluidBuffers = false;
 			bool exceedFluidMax = false;
-			int32 fixedBufferSize = 50;   // Default to game normal
+			int32 fixedFluidBufferSize = 50;   // Default to game normal
 			mutable int32 sizeInCubicMetres = 50; // Default to game normal, this can change even if we are declared const.
 			mutable int32 sizeInLitres = 50000;   // Default to game normal, this can change even if we are declared const.
 			
