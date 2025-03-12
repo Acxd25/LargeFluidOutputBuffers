@@ -48,7 +48,7 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 			int32 sizeInLitres = 50000;   // Default to game normal
 		};
 
-		// Actually process the buffers, do not call directly via any friend mechanisms.  Use
+		// Actually process the buffers, do not call any of these directly via any friend mechanisms.  Use
 		// the public methods
 		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
 		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
