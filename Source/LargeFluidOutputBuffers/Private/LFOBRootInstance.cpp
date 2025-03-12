@@ -165,6 +165,7 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 			if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
 			{
 				const FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
+				const FString fluidType = form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Liquid");
 
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
 				if (parameters.autoSetFluidBuffers)
@@ -173,7 +174,7 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 					ProcessFixedFluidBufferSize(parameters);
 
 				inventory->AddArbitrarySlotSize(i, parameters.sizeInLitres);
-				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
+				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, *fluidType, *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
 			}
 			else if (form == EResourceForm::RF_SOLID && parameters.processSolids)
 			{
