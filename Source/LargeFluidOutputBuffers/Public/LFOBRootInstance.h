@@ -21,20 +21,6 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 {
 	GENERATED_BODY()
 
-	enum Direction
-	{
-		INPUT,
-		OUTPUT
-	};
-
-	struct ProcessingParameters
-	{
-		bool autoSetBuffers = false;
-		bool exceedMax = false;
-		int32 sizeInCubicMetres = 50; // Default to game normal
-		int32 sizeInLitres = 50000;   // Default to game normal
-	};
-
 	public:
 		// Buffer Process functions
 		void ProcessOutputBuffers(AFGBuildableManufacturer* manufacturer);
@@ -48,6 +34,20 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 		virtual void DispatchLifecycleEvent(ELifecyclePhase phase) override;
 
 	private:
+		enum Direction
+		{
+			INPUT,
+			OUTPUT
+		};
+
+		struct ProcessingParameters
+		{
+			bool autoSetBuffers = false;
+			bool exceedMax = false;
+			int32 sizeInCubicMetres = 50; // Default to game normal
+			int32 sizeInLitres = 50000;   // Default to game normal
+		};
+
 		// Actually process the buffers, do not call directly via any friend mechanisms.  Use
 		// the public methods
 		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
