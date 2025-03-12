@@ -98,11 +98,10 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 	parameters.autoSetBuffers = config.DynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
 	parameters.exceedMax = config.DynamicSettings.ExceedPipeMax;
+	parameters.fixedBufferSize = config.OutputBufferSizeFluids;
+	parameters.productionBoost = productionBoost;
 
-	if (!parameters.autoSetBuffers)
-		ProcessStandardBufferSize(parameters, config.OutputBufferSizeFluids);
-
-	ProcessInventory(inventory, parameters, recipe, Direction::OUTPUT, productionBoost);
+	ProcessInventory(inventory, parameters, recipe);
 
 	// Now we have done all this we should recalculate if this machine can produce
 	// Fixes a bug where depending on order execution a machine can be left in an infinite idle state post buffer
@@ -140,21 +139,23 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 	parameters.autoSetBuffers = config.InputDynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
 	parameters.exceedMax = config.InputDynamicSettings.ExceedPipeMax;
+	parameters.fixedBufferSize = config.InputBufferSizeFluids;
+	parameters.direction = Direction::INPUT;
 
-	if (!parameters.autoSetBuffers)
-		ProcessStandardBufferSize(parameters, config.InputBufferSizeFluids);
-
-	ProcessInventory(inventory, parameters, recipe, Direction::INPUT);
+	ProcessInventory(inventory, parameters, recipe);
 }
 
 /*
-* Process the provided inventory against the provided items, this could be an input or output inventory compared agsinst ingredients or products.
+* Process the provided inventory against the provided items, this could be an input or output inventory compared against ingredients or products.
 */
-void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe, Direction direction, float productionBoost)
+void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe)
 {
 	FString mode = parameters.autoSetBuffers ? parameters.exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
-	FString tDirection = direction == Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
-	TArray<FItemAmount> items = direction == Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
+	FString tDirection = parameters.direction == Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
+	TArray<FItemAmount> items = parameters.direction == Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
+
+	if (!parameters.autoSetBuffers)
+		ProcessStandardBufferSize(parameters);
 
 	// Check those recipe items for being a gas or liquid and set the buffer size if they are
 	for (int32 i = 0; i < items.Num(); i++)
@@ -170,7 +171,7 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, Proce
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
 				if (parameters.autoSetBuffers)
 				{
-					parameters.sizeInLitres = ceil(items[i].Amount * 2 * productionBoost);
+					parameters.sizeInLitres = ceil(items[i].Amount * 2 * parameters.productionBoost);
 					// Ensure we are never less than 50m3
 					if (parameters.sizeInLitres < 50000)
 					{
@@ -194,10 +195,10 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, Proce
 /*
 * Determine the calculated buffer size for an inventory buffer in litres.
 */
-void ULFOBRootInstance::ProcessStandardBufferSize(ProcessingParameters& parameters, int32 requestedBufferSize)
+void ULFOBRootInstance::ProcessStandardBufferSize(ProcessingParameters& parameters)
 {
 	// Grab the requested size in m3
-	parameters.sizeInCubicMetres = requestedBufferSize;
+	parameters.sizeInCubicMetres = parameters.fixedBufferSize;
 	// Make sure we are never less than 50m3 and never more than 600m3, just a basic sanity check.
 	if (parameters.sizeInCubicMetres < 50)
 	{
