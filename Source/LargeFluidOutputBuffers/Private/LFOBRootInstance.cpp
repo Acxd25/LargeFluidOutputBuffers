@@ -112,6 +112,13 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 
 void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
 {
+	// Grab the Configuration for this mod.
+	FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
+
+	// Should we even be doing this?
+	if (!config.EnableInputAdjustments)
+		return;
+
 	// Is recipe set?
 	if (not IsValid(recipe))
 	{
@@ -127,15 +134,6 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 		UE_LOG(LogLFOB, Error, TEXT("%s input inventory IsValid Failed"), *manufacturer->GetName());
 		return;
 	}
-
-	// Grab the Configuration for this mod.
-	FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
-
-	// Should we even be doing this?
-	bool modifyInputs = config.EnableInputAdjustments;
-
-	if (!modifyInputs)
-		return;
 
 	ProcessingParameters parameters;
 	// Should we auto calculate the correct buffer sizes?
