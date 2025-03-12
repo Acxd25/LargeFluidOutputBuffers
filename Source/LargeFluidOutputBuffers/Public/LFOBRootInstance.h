@@ -50,14 +50,15 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 			bool autoSetFluidBuffers = false;
 			bool exceedFluidMax = false;
 			int32 fixedBufferSize = 50;   // Default to game normal
-			mutable int32 sizeInCubicMetres = 50; // Default to game normal
-			mutable int32 sizeInLitres = 50000;   // Default to game normal
+			mutable int32 sizeInCubicMetres = 50; // Default to game normal, this can change even if we are declared const.
+			mutable int32 sizeInLitres = 50000;   // Default to game normal, this can change even if we are declared const.
 			
 			// Solid variables
+			bool processSolids = false;
 			bool autoSetSolidBuffers = false;
 			bool allowBelowMinStack = false;
 			int32 fixedSolidStackSize = 50;
-			mutable int32 solidStackSize = 50;
+			mutable int32 solidStackSize = 50;  // Default to game normal, this can change even if we are declared const.
 		};
 
 		// Actually process the buffers, do not call any of these directly via any friend mechanisms.  Use
@@ -65,10 +66,10 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, float productionBoost);
 		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe);
 		void ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe);
-		void ProcessFixedFluidBufferSize(const ProcessingParameters& parameters);
-		void ProcessDynamicFluidBufferSize(FItemAmount item, const ProcessingParameters& parameters);
-		void ProcessFixedSolidBufferSize(const ProcessingParameters& parameters);
-		void ProcessDynamicSolidBufferSize(FItemAmount item, const ProcessingParameters& parameters);
+		static inline void ProcessFixedFluidBufferSize(const ProcessingParameters& parameters);
+		static inline void ProcessDynamicFluidBufferSize(const FItemAmount item, const ProcessingParameters& parameters);
+		static inline void ProcessFixedSolidBufferSize(const ProcessingParameters& parameters);
+		static inline void ProcessDynamicSolidBufferSize(const FItemAmount item, const ProcessingParameters& parameters);
 		// Recalculate if we can produce products
 		void RecaculateCanProduceOutput(AFGBuildableManufacturer* manufacturer);
 };

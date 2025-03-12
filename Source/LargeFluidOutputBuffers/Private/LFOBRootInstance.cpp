@@ -174,9 +174,14 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const
 				inventory->AddArbitrarySlotSize(i, parameters.sizeInLitres);
 				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
 			}
-			else if (form == EResourceForm::RF_SOLID)
+			else if (form == EResourceForm::RF_SOLID  && parameters.processSolids)
 			{
-				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found Solid %s '%s' at index %d, Doing nothing for now."), *mode, *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
+				if (parameters.autoSetSolidBuffers)
+					ProcessDynamicSolidBufferSize(items[i], parameters);
+				else
+					ProcessFixedSolidBufferSize(parameters);
+				inventory->AddArbitrarySlotSize(i, parameters.solidStackSize);
+				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found Solid %s '%s' at index %d, setting buffer from %d to %d items"), *mode, *tDirection, *itemDesc, i, items[i].Amount, parameters.solidStackSize);
 			}
 		}
 	}
@@ -202,7 +207,7 @@ void ULFOBRootInstance::ProcessFixedFluidBufferSize(const ProcessingParameters& 
 	parameters.sizeInLitres = 1000 * parameters.sizeInCubicMetres;
 }
 
-void ULFOBRootInstance::ProcessDynamicFluidBufferSize(FItemAmount item, const ProcessingParameters& parameters)
+void ULFOBRootInstance::ProcessDynamicFluidBufferSize(const FItemAmount item, const ProcessingParameters& parameters)
 {
 	parameters.sizeInLitres = ceil(item.Amount * 2 * parameters.productionBoost);
 	// Ensure we are never less than 50m3
@@ -221,16 +226,16 @@ void ULFOBRootInstance::ProcessDynamicFluidBufferSize(FItemAmount item, const Pr
 void ULFOBRootInstance::ProcessFixedSolidBufferSize(const ProcessingParameters& parameters)
 {
 	parameters.solidStackSize = parameters.fixedSolidStackSize;
-	if (!parameters.allowBelowMinStack || parameters.sizeInCubicMetres < 50)
+	if (!parameters.allowBelowMinStack && parameters.solidStackSize < 50)
 	{
 		parameters.solidStackSize = 50;
 	}
 }
 
-void ULFOBRootInstance::ProcessDynamicSolidBufferSize(FItemAmount item, const ProcessingParameters& parameters)
+void ULFOBRootInstance::ProcessDynamicSolidBufferSize(const FItemAmount item, const ProcessingParameters& parameters)
 {
 	parameters.solidStackSize = ceil(item.Amount * 2 * parameters.productionBoost);
-	if (!parameters.allowBelowMinStack || parameters.sizeInCubicMetres < 50)
+	if (!parameters.allowBelowMinStack && parameters.solidStackSize < 50)
 	{
 		parameters.solidStackSize = 50;
 	}
