@@ -56,7 +56,8 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
 		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
 		void ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe);
-		void ProcessStandardBufferSize(ProcessingParameters& parameters);
+		void ProcessFixedBufferSize(ProcessingParameters& parameters);
+		void ProcessDynamicBufferSize(FItemAmount item, ProcessingParameters& parameters);
 		// Recalculate if we can produce products
 		void RecaculateCanProduceOutput(AFGBuildableManufacturer* manufacturer);
 };
