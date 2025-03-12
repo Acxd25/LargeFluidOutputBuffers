@@ -60,7 +60,7 @@ void ULFOBRootInstance::ProcessInputBuffers(AFGBuildableManufacturer* manufactur
 	ProcessInputBuffersInternal(manufacturer, manufacturer->GetCurrentRecipe());
 }
 
-void ULFOBRootInstance::ProcessInputBuffers(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
+void ULFOBRootInstance::ProcessInputBuffers(AFGBuildableManufacturer* manufacturer, const TSubclassOf<class UFGRecipe> recipe)
 {
 	// Is manufacturer valid?  
 	if (not IsValid(manufacturer))
@@ -72,7 +72,7 @@ void ULFOBRootInstance::ProcessInputBuffers(AFGBuildableManufacturer* manufactur
 	ProcessInputBuffersInternal(manufacturer, recipe);
 }
 
-void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost)
+void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, float productionBoost)
 {
 	// Is recipe set?
 	if (not IsValid(recipe))
@@ -95,9 +95,9 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 
 	ProcessingParameters parameters;
 	// Should we auto calculate the correct buffer sizes?
-	parameters.autoSetBuffers = config.DynamicSettings.AutoSetBuffers;
+	parameters.autoSetFluidBuffers = config.DynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
-	parameters.exceedMax = config.DynamicSettings.ExceedPipeMax;
+	parameters.exceedFluidMax = config.DynamicSettings.ExceedPipeMax;
 	parameters.fixedBufferSize = config.OutputBufferSizeFluids;
 	parameters.productionBoost = productionBoost;
 
@@ -109,7 +109,7 @@ void ULFOBRootInstance::ProcessOutputBuffersInternal(AFGBuildableManufacturer* m
 	RecaculateCanProduceOutput(manufacturer);
 }
 
-void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf<class UFGRecipe> recipe)
+void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf<class UFGRecipe> recipe)
 {
 	// Grab the Configuration for this mod.
 	FLargeFluidOutputBuffersConfigurationStruct config = FLargeFluidOutputBuffersConfigurationStruct::GetActiveConfig(GetWorld());
@@ -136,9 +136,9 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 
 	ProcessingParameters parameters;
 	// Should we auto calculate the correct buffer sizes?
-	parameters.autoSetBuffers = config.InputDynamicSettings.AutoSetBuffers;
+	parameters.autoSetFluidBuffers = config.InputDynamicSettings.AutoSetBuffers;
 	// Can we exceed 600m3 during an autoset?
-	parameters.exceedMax = config.InputDynamicSettings.ExceedPipeMax;
+	parameters.exceedFluidMax = config.InputDynamicSettings.ExceedPipeMax;
 	parameters.fixedBufferSize = config.InputBufferSizeFluids;
 	parameters.direction = Direction::INPUT;
 
@@ -148,9 +148,9 @@ void ULFOBRootInstance::ProcessInputBuffersInternal(AFGBuildableManufacturer* ma
 /*
 * Process the provided inventory against the provided items, this could be an input or output inventory compared against ingredients or products.
 */
-void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe)
+void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe)
 {
-	FString mode = parameters.autoSetBuffers ? parameters.exceedMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
+	FString mode = parameters.autoSetFluidBuffers ? parameters.exceedFluidMax ? TEXT("DYNAMIC+") : TEXT("DYNAMIC") : TEXT("FIXED");
 	FString tDirection = parameters.direction == Direction::OUTPUT ? TEXT("Output") : TEXT("Input");
 	TArray<FItemAmount> items = parameters.direction == Direction::OUTPUT ? UFGRecipe::GetProducts(recipe) : UFGRecipe::GetIngredients(recipe);
 
@@ -166,10 +166,10 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, Proce
 			if (form == EResourceForm::RF_GAS || form == EResourceForm::RF_LIQUID)
 			{
 				// Are we supposed to automatically set the buffer size?  If so calculate the correct value.
-				if (parameters.autoSetBuffers)
-					ProcessDynamicBufferSize(items[i], parameters);
+				if (parameters.autoSetFluidBuffers)
+					ProcessDynamicFluidBufferSize(items[i], parameters);
 				else
-					ProcessFixedBufferSize(parameters);
+					ProcessFixedFluidBufferSize(parameters);
 
 				inventory->AddArbitrarySlotSize(i, parameters.sizeInLitres);
 				UE_LOG(LogLFOB, Display, TEXT("[MODE = %s] Found %s %s '%s' at index %d, setting buffer to %d m3"), *mode, form == EResourceForm::RF_GAS ? TEXT("Gas") : TEXT("Fluid"), *tDirection, *itemDesc, i, parameters.sizeInCubicMetres);
@@ -185,7 +185,7 @@ void ULFOBRootInstance::ProcessInventory(UFGInventoryComponent* inventory, Proce
 /*
 * Determine the calculated buffer size for an inventory buffer in litres.
 */
-void ULFOBRootInstance::ProcessFixedBufferSize(ProcessingParameters& parameters)
+void ULFOBRootInstance::ProcessFixedFluidBufferSize(const ProcessingParameters& parameters)
 {
 	// Grab the requested size in m3
 	parameters.sizeInCubicMetres = parameters.fixedBufferSize;
@@ -202,7 +202,7 @@ void ULFOBRootInstance::ProcessFixedBufferSize(ProcessingParameters& parameters)
 	parameters.sizeInLitres = 1000 * parameters.sizeInCubicMetres;
 }
 
-void ULFOBRootInstance::ProcessDynamicBufferSize(FItemAmount item, ProcessingParameters& parameters)
+void ULFOBRootInstance::ProcessDynamicFluidBufferSize(FItemAmount item, const ProcessingParameters& parameters)
 {
 	parameters.sizeInLitres = ceil(item.Amount * 2 * parameters.productionBoost);
 	// Ensure we are never less than 50m3
@@ -211,11 +211,29 @@ void ULFOBRootInstance::ProcessDynamicBufferSize(FItemAmount item, ProcessingPar
 		parameters.sizeInLitres = 50000;
 	}
 	// Only do this check if we are not exceeding 600m3
-	else if (!parameters.exceedMax && parameters.sizeInLitres > 600000)
+	else if (!parameters.exceedFluidMax && parameters.sizeInLitres > 600000)
 	{
 		parameters.sizeInLitres = 600000;
 	}
 	parameters.sizeInCubicMetres = parameters.sizeInLitres / 1000;
+}
+
+void ULFOBRootInstance::ProcessFixedSolidBufferSize(const ProcessingParameters& parameters)
+{
+	parameters.solidStackSize = parameters.fixedSolidStackSize;
+	if (!parameters.allowBelowMinStack || parameters.sizeInCubicMetres < 50)
+	{
+		parameters.solidStackSize = 50;
+	}
+}
+
+void ULFOBRootInstance::ProcessDynamicSolidBufferSize(FItemAmount item, const ProcessingParameters& parameters)
+{
+	parameters.solidStackSize = ceil(item.Amount * 2 * parameters.productionBoost);
+	if (!parameters.allowBelowMinStack || parameters.sizeInCubicMetres < 50)
+	{
+		parameters.solidStackSize = 50;
+	}
 }
 
 void ULFOBRootInstance::RecaculateCanProduceOutput(AFGBuildableManufacturer* manufacturer)

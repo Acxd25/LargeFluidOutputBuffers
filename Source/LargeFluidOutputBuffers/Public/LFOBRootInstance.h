@@ -42,22 +42,33 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 
 		struct ProcessingParameters
 		{
+			// Generic variables
 			Direction direction = Direction::OUTPUT;
-			bool autoSetBuffers = false;
-			bool exceedMax = false;
-			int32 fixedBufferSize = 50;   // Default to game normal
-			int32 sizeInCubicMetres = 50; // Default to game normal
-			int32 sizeInLitres = 50000;   // Default to game normal
 			float productionBoost = 1.f;  // Default to 1x, i.e. no slooping or we are an input
+
+			// Fluid Variables
+			bool autoSetFluidBuffers = false;
+			bool exceedFluidMax = false;
+			int32 fixedBufferSize = 50;   // Default to game normal
+			mutable int32 sizeInCubicMetres = 50; // Default to game normal
+			mutable int32 sizeInLitres = 50000;   // Default to game normal
+			
+			// Solid variables
+			bool autoSetSolidBuffers = false;
+			bool allowBelowMinStack = false;
+			int32 fixedSolidStackSize = 50;
+			mutable int32 solidStackSize = 50;
 		};
 
 		// Actually process the buffers, do not call any of these directly via any friend mechanisms.  Use
 		// the public methods
-		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe, float productionBoost);
-		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, TSubclassOf< class UFGRecipe > recipe);
-		void ProcessInventory(UFGInventoryComponent* inventory, ProcessingParameters& parameters, TSubclassOf<class UFGRecipe> recipe);
-		void ProcessFixedBufferSize(ProcessingParameters& parameters);
-		void ProcessDynamicBufferSize(FItemAmount item, ProcessingParameters& parameters);
+		void ProcessOutputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe, float productionBoost);
+		void ProcessInputBuffersInternal(AFGBuildableManufacturer* manufacturer, const TSubclassOf< class UFGRecipe > recipe);
+		void ProcessInventory(UFGInventoryComponent* inventory, const ProcessingParameters& parameters, const TSubclassOf<class UFGRecipe> recipe);
+		void ProcessFixedFluidBufferSize(const ProcessingParameters& parameters);
+		void ProcessDynamicFluidBufferSize(FItemAmount item, const ProcessingParameters& parameters);
+		void ProcessFixedSolidBufferSize(const ProcessingParameters& parameters);
+		void ProcessDynamicSolidBufferSize(FItemAmount item, const ProcessingParameters& parameters);
 		// Recalculate if we can produce products
 		void RecaculateCanProduceOutput(AFGBuildableManufacturer* manufacturer);
 };
