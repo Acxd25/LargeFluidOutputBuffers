@@ -53,7 +53,7 @@ class LARGEFLUIDOUTPUTBUFFERS_API ULFOBRootInstance : public UGameInstanceModule
 			mutable int32 sizeInCubicMetres = 50; // Default to game normal, this can change even if we are declared const.
 			mutable int32 sizeInLitres = 50000;   // Default to game normal, this can change even if we are declared const.
 			
-			// Solid variables
+			// Solid variables -- Currently perma disabled as no GUI to turn it on.
 			bool processSolids = false;
 			bool autoSetSolidBuffers = false;
 			bool allowBelowMinStack = false;
