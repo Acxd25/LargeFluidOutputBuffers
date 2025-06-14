@@ -1,13 +1,13 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.1.1",
-	"SemVersion": "1.1.1",
-	"GameVersion": ">=415558",
+	"VersionName": "1.1.2",
+	"SemVersion": "1.1.2",
+	"GameVersion": ">=416835",
 	"FriendlyName": "Large Fluid Output Buffers",
-	"Description": "Increase Fluid Output Bufers to 50-500m³ on all producers.",
+	"Description": "Increase fluid output/input buffers to 50-500m³ on all producers",
 	"Category": "Modding",
-	"CreatedBy": "Joanna Hammond, Acxd",
+	"CreatedBy": "Acxd, Joanna Hammond",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "",
@@ -26,8 +26,8 @@
 	"Plugins": [
 		{
 			"Name": "SML",
-			"Enabled": true,
-			"SemVersion": "^3.11.1"
+			"SemVersion": "^3.11.1",
+			"Enabled": true
 		}
 	]
 }
